@@ -1,0 +1,13 @@
+
+###> symfony/framework-bundle ###
+.env
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> custom ###
+/node_modules/
+/public/Nginx-1.12_vhost.conf
+/.idea/
+###< custom ###
