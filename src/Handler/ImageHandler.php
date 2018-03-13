@@ -59,6 +59,7 @@ class ImageHandler
      */
     public function postImage(Request $request): JsonResponse
     {
+        $this->check($request);
         $requestData = array_merge(
             $request->request->all(),
             $request->files->all()
@@ -85,6 +86,7 @@ class ImageHandler
      */
     public function getList(Request $request): JsonResponse
     {
+        $this->check($request);
         $id = $request->get('id', []);
         $images = $this->getImagesById($id);
 
@@ -203,5 +205,15 @@ class ImageHandler
             'path' => $this->getOriginalPath($image),
             'previews' => $this->getImagePreviews($image)
         ];
+    }
+
+    /**
+     * @param Request $request
+     */
+    private function check(Request $request): void
+    {
+        if ($request->getContentType() === 'json') {
+            $request->request->replace(json_decode($request->getContent(), true));
+        }
     }
 }
