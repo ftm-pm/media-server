@@ -23,7 +23,7 @@ class ImageController extends Controller
      */
     public function postAction(Request $request): JsonResponse
     {
-        $helper = $this->get('app.image_handler');
+        $helper = $this->get('App\Handler\ImageHandler');
 
         return $helper->postImage($request);
     }

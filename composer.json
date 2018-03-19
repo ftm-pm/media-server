@@ -6,6 +6,7 @@
         "ext-iconv": "*",
         "gesdinet/jwt-refresh-token-bundle": "^0.3.2",
         "gfreeau/get-jwt-bundle": "^2.0",
+        "guzzlehttp/guzzle": "^6.3",
         "lexik/jwt-authentication-bundle": "^2.4",
         "liip/imagine-bundle": "2.0.x-dev",
         "nelmio/cors-bundle": "^1.5",

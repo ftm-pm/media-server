@@ -65,13 +65,13 @@ class ImageHandler
             $request->files->all()
         );
         $form = $this->getSubmittedForm($requestData);
-
+        $previews = $request->request->get('previews', []);
         $response = [];
         $status = 200;
         if($form->isSubmitted() && $form->isValid()) {
             $image = $form->getData();
             $this->saveAndRefreshImage($image);
-            $response = $this->getImageResponseData($image);
+            $response = $this->getImageResponseData($image, $previews, true);
         } else {
             $response['error'] = $form->getErrors() ?? 'Form is empty or invalid';
             $status = 500;
@@ -166,14 +166,28 @@ class ImageHandler
     }
 
     /**
-     * TODO: Вернуть список превью
-     *
      * @param Image $image
+     * @param array $previews
+     * @param bool $resolve
      * @return array
      */
-    private function getImagePreviews(Image $image): array
+    private function getImagePreviews(Image $image, array $previews = [], bool $resolve = false): array
     {
-        return [];
+        $index = 1;
+        $client = new \GuzzleHttp\Client();
+        foreach ($previews as $key => $preview) {
+            $path = $this->cacheManager->getBrowserPath($this->getOriginalPath($image), 'view' . $index, $preview);
+            if ($resolve) {
+                $client->request('GET',  $path);
+                $previews[$key] =  preg_replace('/\?.*/', '', str_replace('/resolve', '', $path));
+            } else {
+                $previews[$key] = $path;
+            }
+
+            $index++;
+        }
+
+        return $previews;
     }
 
     /**
@@ -197,14 +211,23 @@ class ImageHandler
 
     /**
      * @param Image $image
+     * @param array $previews
+     * @param bool $resolve
      * @return array
      */
-    private function getImageResponseData(Image $image): array
+    private function getImageResponseData(Image $image, array $previews = [], bool $resolve = false): array
     {
-        return [
-            'path' => $this->getOriginalPath($image),
-            'previews' => $this->getImagePreviews($image)
-        ];
+        $data = [];
+        $path = $this->getOriginalPath($image);
+        if(!empty($path)) {
+            $data['origin'] = getenv('APP_HOST') . $path;
+        }
+        $previews =  $this->getImagePreviews($image, $previews, $resolve);
+        if(!empty($previews)) {
+            $data['previews'] = $previews;
+        }
+
+        return $data;
     }
 
     /**

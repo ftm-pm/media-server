@@ -20,7 +20,10 @@ class ImageType extends AbstractType
     {
         $builder
             ->add('imageFile', FileType::class, [
-                'label' => false,
+                'required' => false
+            ])
+            ->add('previews', ArrayType::class, [
+                'mapped' => false,
                 'required' => false
             ])
         ;

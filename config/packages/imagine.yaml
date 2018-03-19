@@ -21,16 +21,57 @@ liip_imagine:
                 upscale: { min: [300, 300] }
                 relative_resize: { heighten: 300 }
 
-        # Posts
-        post_preview:
+        # Views
+        view1:
             quality: 75
             filters:
-                thumbnail: { size: [760, 505], mode: outbound }
-
-        post_box:
+                upscale: { min: [50, 50] }
+                thumbnail: { size: [50, 50], mode: outbound }
+        view1_x2:
             quality: 75
             filters:
-                thumbnail: { size: [375, 500], mode: outbound }
+                upscale: { min: [50 50] }
+                thumbnail: { size: [50 50], mode: outbound }
+        view2:
+            quality: 75
+            filters:
+                upscale: { min: [50, 50] }
+                thumbnail: { size: [50, 50], mode: outbound }
+        view2_x2:
+            quality: 75
+            filters:
+                upscale: { min: [50 50] }
+                thumbnail: { size: [50 50], mode: outbound }
+        view3:
+            quality: 75
+            filters:
+                upscale: { min: [50, 50] }
+                thumbnail: { size: [50, 50], mode: outbound }
+        view3_x2:
+            quality: 75
+            filters:
+                upscale: { min: [50 50] }
+                thumbnail: { size: [50 50], mode: outbound }
+        view4:
+            quality: 75
+            filters:
+                upscale: { min: [50, 50] }
+                thumbnail: { size: [50, 50], mode: outbound }
+        view4_x2:
+            quality: 75
+            filters:
+                upscale: { min: [50 50] }
+                thumbnail: { size: [50 50], mode: outbound }
+        view5:
+            quality: 75
+            filters:
+                upscale: { min: [50, 50] }
+                thumbnail: { size: [50, 50], mode: outbound }
+        view5_x2:
+            quality: 75
+            filters:
+                upscale: { min: [50 50] }
+                thumbnail: { size: [50 50], mode: outbound }
 
 #        # an example thumbnail transformation definition
 #        # https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html#create-thumbnails
