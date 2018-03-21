@@ -90,7 +90,7 @@ The MediaServer API returns one field with the path to the source image:
 }
 ```
 
-### Создание превью
+### Create preview
 
 You can create a different preview for image using [LiipImagineBundle][3]. In the api, the ``previews`` parameter is an array consisting of LiipImagineBundle 
 filter configurations.
