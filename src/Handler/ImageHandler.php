@@ -116,6 +116,26 @@ class ImageHandler
         return new JsonResponse($response, $status);
     }
 
+
+    /**
+     * @return JsonResponse
+     */
+    public function delete(Image $image): JsonResponse
+    {
+        $response = [];
+        $status = 400;
+
+        if($image && $image->getImageName()) {
+            $em = $this->doctrine->getManager();
+            $em->remove($image);
+            $em->flush();
+            $response = null;
+            $status = 204;
+        }
+
+        return new JsonResponse($response, $status);
+    }
+
     //////////////////////////////////////
 
     /**

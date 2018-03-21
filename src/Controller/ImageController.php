@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class ImageController extends Controller
 {
     /**
-     * @Route("api/images", name="api_image_create", methods={"POST"})
+     * @Route("api/images", name="api_image_post", methods={"POST"})
      *
      * @param Request $request
      *
@@ -23,9 +23,9 @@ class ImageController extends Controller
      */
     public function postAction(Request $request): JsonResponse
     {
-        $helper = $this->get('App\Handler\ImageHandler');
+        $handler = $this->get('app.image_handler');
 
-        return $helper->postImage($request);
+        return $handler->postImage($request);
     }
 
     /**
@@ -37,9 +37,9 @@ class ImageController extends Controller
      */
     public function getListAction(Request $request): JsonResponse
     {
-        $helper = $this->get('app.image_handler');
+        $handler = $this->get('app.image_handler');
 
-        return $helper->getList($request);
+        return $handler->getList($request);
     }
 
     /**
@@ -51,10 +51,26 @@ class ImageController extends Controller
      *
      * @return JsonResponse
      */
-    public function getIdAction(Image $image): JsonResponse
+    public function getAction(Image $image): JsonResponse
     {
-        $helper = $this->get('app.image_handler');
+        $handler = $this->get('app.image_handler');
 
-        return $helper->get($image);
+        return $handler->get($image);
     }
+
+    /**
+     * @Route("api/images/name/{imageName}", name="api_image_delete_name", methods={"DELETE"})
+     * @Route("api/images/{image}", name="api_image_delete", methods={"DELETE"})
+     *
+     * @param Image $image
+     *
+     * @return JsonResponse
+     */
+    public function deleteAction(Image $image): JsonResponse
+    {
+        $handler = $this->get('app.image_handler');
+
+        return $handler->delete($image);
+    }
+
 }

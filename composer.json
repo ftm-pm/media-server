@@ -1,6 +1,14 @@
 {
+    "name": "ftm-pm/media-server",
+    "description": "MediaServer is a micro application that receives an image file with filters and returns the path to this image and a collection of images with applied filters.",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aleksandr Serenko",
+            "email": "fafnur@yandex.ru"
+        }
+    ],
     "require": {
         "php": "^7.1.3",
         "ext-iconv": "*",
