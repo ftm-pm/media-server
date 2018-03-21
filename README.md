@@ -3,7 +3,7 @@
 The MediaServer is a micro application that receives an image file with filters and returns 
 the path to this image and a collection of images with applied filters.
 
-Russian documentation [here](https://github.com/ftm-pm/media-server/blob/master/docs/ru/index.md).
+Russian documentation [here][doc].
 
 ## Setup
 
@@ -171,6 +171,6 @@ License [MIT][license].
 [3]: https://github.com/liip/LiipImagineBundle
 [4]: https://github.com/lexik/LexikJWTAuthenticationBundle
 [composer]: https://getcomposer.org/
-[doc]: https://github.com/ftm-pm/media-server/blob/master/README.md
+[doc]: https://github.com/ftm-pm/media-server/blob/master/docs/ru/readme.md
 [jwt]: https://github.com/lexik/LexikJWTAuthenticationBundle/blob/master/Resources/doc/index.md
 [license]: https://github.com/ftm-pm/media-server/blob/master/LICENSE.txt
