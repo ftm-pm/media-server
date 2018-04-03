@@ -65,10 +65,13 @@ class ImageHandler
             $request->files->all()
         );
         $form = $this->getSubmittedForm($requestData);
-        $previews = $request->request->get('previews', []);
+        $previews = $request->get('previews', []);
+        if (!is_array($previews)) {
+            $previews = json_decode($previews, true);
+        }
         $response = [];
         $status = 200;
-        if($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $image = $form->getData();
             $this->saveAndRefreshImage($image);
             $response = $this->getImageResponseData($image, $previews, true);
@@ -108,7 +111,7 @@ class ImageHandler
         $response = [];
         $status = 404;
 
-        if($image &&  $image->getImageName()) {
+        if ($image && $image->getImageName()) {
             $response = $this->getImageResponseData($image);
             $status = 200;
         }
@@ -125,7 +128,7 @@ class ImageHandler
         $response = [];
         $status = 400;
 
-        if($image && $image->getImageName()) {
+        if ($image && $image->getImageName()) {
             $em = $this->doctrine->getManager();
             $em->remove($image);
             $em->flush();
@@ -141,9 +144,9 @@ class ImageHandler
     /**
      * Creates and returns a Form instance from the type of the form.
      *
-     * @param string|FormTypeInterface $type    The built type of the form
-     * @param mixed                    $data    The initial data for the form
-     * @param array                    $options Options for the form
+     * @param string|FormTypeInterface $type The built type of the form
+     * @param mixed $data The initial data for the form
+     * @param array $options Options for the form
      *
      * @return FormInterface
      */
@@ -198,8 +201,8 @@ class ImageHandler
         foreach ($previews as $key => $preview) {
             $path = $this->cacheManager->getBrowserPath($this->getOriginalPath($image), 'view' . $index, $preview);
             if ($resolve) {
-                $client->request('GET',  $path);
-                $previews[$key] =  preg_replace('/\?.*/', '', str_replace('/resolve', '', $path));
+                $client->request('GET', $path);
+                $previews[$key] = preg_replace('/\?.*/', '', str_replace('/resolve', '', $path));
             } else {
                 $previews[$key] = $path;
             }
@@ -239,11 +242,11 @@ class ImageHandler
     {
         $data = [];
         $path = $this->getOriginalPath($image);
-        if(!empty($path)) {
+        if (!empty($path)) {
             $data['origin'] = getenv('APP_HOST') . $path;
         }
-        $previews =  $this->getImagePreviews($image, $previews, $resolve);
-        if(!empty($previews)) {
+        $previews = $this->getImagePreviews($image, $previews, $resolve);
+        if (!empty($previews)) {
             $data['previews'] = $previews;
         }
 
