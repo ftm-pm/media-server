@@ -2,8 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\User;
-use App\Exception\UserExistsException;
 use App\Handler\UserHandler;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
@@ -46,23 +44,6 @@ class DoctrineEventSubscriber implements EventSubscriber
     public function prePersist(LifecycleEventArgs $args)
     {
         $this->update($args);
-
-        $entity = $args->getObject();
-        if ($entity instanceof User) {
-           $this->userHandler->sendActivateMessage($entity);
-        }
-    }
-
-    public function sendMail(LifecycleEventArgs $args)
-    {
-        $obm = $args->getObjectManager();
-        $rep = $obm->getRepository('App:User');
-        $user = $args->getObject();
-        $userExists = $rep->loadUserByUsername($user->getEmail(), $user->getUsername());
-
-        if($userExists) {
-            throw new UserExistsException('User exist.');
-        }
     }
 
     /**
@@ -78,10 +59,6 @@ class DoctrineEventSubscriber implements EventSubscriber
      */
     public function update(LifecycleEventArgs $args)
     {
-        $entity = $args->getObject();
-
-        if ($entity instanceof User) {
-            $this->userHandler->hashPassword($entity);
-        }
+        // $entity = $args->getObject();
     }
 }

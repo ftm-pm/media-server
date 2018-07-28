@@ -22,7 +22,7 @@ security:
         #    anonymous: ~
 
         gettoken:
-            pattern:  ^/api/token/get
+            pattern:  ^/api/token
             stateless: true
             gfreeau_get_jwt:
                 username_parameter: username
@@ -58,7 +58,7 @@ security:
     access_control:
         - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         #- { path: ^/api/reset, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/token/get, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/token, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/token/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/token/confirmation, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

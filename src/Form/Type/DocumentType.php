@@ -8,10 +8,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class ImageType
+ * Class DocumentType
  * @package App\Form\Type
  */
-class ImageType extends AbstractType
+class DocumentType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -19,12 +19,8 @@ class ImageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('imageFile', FileType::class, [
+            ->add('documentFile', FileType::class, [
                 'required' => true
-            ])
-            ->add('previews', ArrayType::class, [
-                'mapped' => false,
-                'required' => false
             ])
         ;
     }
@@ -35,7 +31,7 @@ class ImageType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'App\Entity\Image',
+            'data_class' => 'App\Entity\Document',
             'csrf_protection' => false
         ]);
     }
@@ -45,6 +41,6 @@ class ImageType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'form_image';
+        return 'form_document';
     }
 }

@@ -30,6 +30,7 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    #Handler
     App\Handler\ImageHandler:
         public: true
         arguments:
@@ -38,14 +39,22 @@ services:
             - "@vich_uploader.templating.helper.uploader_helper"
             - "@liip_imagine.cache.manager"
 
+    App\Handler\DocumentHandler:
+        public: true
+        arguments:
+            - "@doctrine"
+            - "@form.factory"
+            - "@vich_uploader.templating.helper.uploader_helper"
+
     App\Handler\UserHandler:
         public: true
 
-    app.image_handler:
-        alias: App\Handler\ImageHandler
-        public: true
-
+    # EventSubscriber
     App\EventSubscriber\DoctrineEventSubscriber:
         tags:
             - { name: doctrine.event_listener, event: prePersist, lazy: true }
             - { name: doctrine.event_listener, event: preUpdate, lazy: true }
+#
+#    App\EventSubscriber\ApiExceptionSubscriber:
+#        tags:
+#        - { name: kernel.event_subscriber }

@@ -5,19 +5,18 @@ namespace App\Entity;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
- * Class Image
+ * Class Document
  * @package App\Entity
  *
- * @ORM\Table(name="images")
- * @ORM\Entity(repositoryClass="App\Repository\ImageRepository")
+ * @ORM\Table(name="documents")
+ * @ORM\Entity(repositoryClass="App\Repository\DocumentRepository")
  * @Vich\Uploadable
  * @ORM\HasLifecycleCallbacks
  */
-class Image
+class Document
 {
     use TimestampableTrait;
 
@@ -33,24 +32,25 @@ class Image
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      *
-     * @Vich\UploadableField(mapping="image", fileNameProperty="imageName", size="imageSize")
-     * @Assert\NotNull(message="This value should not be blank")
-     * @var File $imageFile
+     * @Vich\UploadableField(mapping="document", fileNameProperty="documentName", size="documentSize")
+     *
+     * @var File $documentFile
      */
-    private $imageFile;
+    private $documentFile;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @var string $imageName
+     *
+     * @var string $documentName
      */
-    private $imageName;
+    private $documentName;
 
     /**
      * @ORM\Column(type="integer")
      *
-     * @var integer $imageSize
+     * @var integer $documentSize
      */
-    private $imageSize;
+    private $documentSize;
 
     /////////////////////////////////
 
@@ -77,14 +77,14 @@ class Image
      * must be able to accept an instance of 'File' as the bundle will inject one here
      * during Doctrine hydration.
      *
-     * @param null|File|\Symfony\Component\HttpFoundation\File\UploadedFile $imageFile
+     * @param null|File|\Symfony\Component\HttpFoundation\File\UploadedFile $documentFile
      * @throws \Exception
      */
-    public function setImageFile(?File $imageFile = null): void
+    public function setDocumentFile(?File $documentFile = null): void
     {
-        $this->imageFile = $imageFile;
+        $this->documentFile = $documentFile;
 
-        if (null !== $imageFile) {
+        if (null !== $documentFile) {
             // It is required that at least one field changes if you are using doctrine
             // otherwise the event listeners won't be called and the file is lost
             $this->updatedAt = new \DateTimeImmutable();
@@ -94,40 +94,40 @@ class Image
     /**
      * @return null|File
      */
-    public function getImageFile(): ?File
+    public function getDocumentFile(): ?File
     {
-        return $this->imageFile;
+        return $this->documentFile;
     }
 
     /**
-     * @param null|string $imageName
+     * @param null|string $documentName
      */
-    public function setImageName(?string $imageName): void
+    public function setDocumentName(?string $documentName): void
     {
-        $this->imageName = $imageName;
+        $this->documentName = $documentName;
     }
 
     /**
      * @return null|string
      */
-    public function getImageName(): ?string
+    public function getDocumentName(): ?string
     {
-        return $this->imageName;
+        return $this->documentName;
     }
 
     /**
-     * @param int|null $imageSize
+     * @param int|null $documentSize
      */
-    public function setImageSize(?int $imageSize): void
+    public function setDocumentSize(?int $documentSize): void
     {
-        $this->imageSize = $imageSize;
+        $this->documentSize = $documentSize;
     }
 
     /**
      * @return int|null
      */
-    public function getImageSize(): ?int
+    public function getDocumentSize(): ?int
     {
-        return $this->imageSize;
+        return $this->documentSize;
     }
 }

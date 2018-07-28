@@ -1,7 +1,7 @@
 # MediaServer
 
-The MediaServer is a micro application that receives an image file with filters and returns 
-the path to this image and a collection of images with applied filters.
+The MediaServer is a micro application that receives an image file with filters(or simple file) and returns 
+the path to this image and a collection of images with applied filters (or path for simple file).
 
 Russian documentation [here][doc].
 
@@ -47,7 +47,7 @@ or using curl
 ```bash
 curl -X POST http://my-project/api/register -d username=johndoe -d password=test -d email=johndoe@example.com
 ```
-After the confirmation email, get token. Send a new request to http://my-project/api/token/get:
+After the confirmation email, get token. Send a new request to http://my-project/api/token:
 ```json
 {
   "username": "johndoe",
@@ -57,7 +57,7 @@ After the confirmation email, get token. Send a new request to http://my-project
 
 or using curl
 ```bash
-curl -X POST http://my-project/api/token/get -d username=johndoe -d password=test
+curl -X POST http://my-project/api/token -d username=johndoe -d password=test
 ```
 
 The MediaServer API returns two fields: 
@@ -125,10 +125,33 @@ curl -X POST -H "Authorization: Bearer your_token" -H "Content-Type: multipart/f
 The MediaServer API returns the path to the source image, as well as a previews collection:
 ```json
 {
+  "id": 1,
+  "createdAt": "2018-07-28T18:35:47+03:00",
+  "updatedAt": "2018-07-28T18:35:47+03:00",
+  "name": "5ab1ed5b538e9914783874.png",
+  "size": 536793,
   "origin": "http://my-project/uploads/images/5ab/1ed/5b5/5ab1ed5b538e9914783874.jpg",
   "previews": {
     "small": "http://my-project/media/cache/view1/rc/qcJ6p4ur/uploads/images/5ab/1ed/5b5/5ab1ed5b538e9914783874.jpg"
   }
+}
+```
+
+### Download simple file
+For create a new document, you can send a new **post**  request with parameter ``documentFile``:
+```bash
+curl -X POST -H "Authorization: Bearer your_token" -H "Content-Type: multipart/form-data" -F "documentFile=@/path/for/your/file.jpg" http://my-project/api/documents
+```
+
+The MediaServer API returns the path to the source document:
+```json
+{
+    "id": 1,
+    "createdAt": "2018-07-28T18:35:47+03:00",
+    "updatedAt": "2018-07-28T18:35:47+03:00",
+    "name": "5b5c8d539fd93267715216.png",
+    "size": 536793,
+    "path": "http://media-server/uploads/documents/5b5/c8d/539/5b5c8d539fd93267715216.png"
 }
 ```
 

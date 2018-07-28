@@ -2,9 +2,8 @@
 
 namespace App\Handler;
 
-use App\Entity\Image;
+use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormInterface;
@@ -14,10 +13,10 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 /**
- * Class ImageHandler
+ * Class DocumentHandler
  * @package App\Handler
  */
-class ImageHandler
+class DocumentHandler
 {
     /**
      * @var Registry
@@ -35,50 +34,40 @@ class ImageHandler
     private $uploaderHelper;
 
     /**
-     * @var CacheManager
-     */
-    private $cacheManager;
-
-    /**
-     * ImageHandler constructor.
+     * DocumentHandler constructor.
      * @param Registry $doctrine
      * @param FormFactory $formFactory
      * @param UploaderHelper $uploaderHelper
-     * @param CacheManager $cacheManager
      */
-    public function __construct(Registry $doctrine, FormFactory $formFactory, UploaderHelper $uploaderHelper, CacheManager $cacheManager)
+    public function __construct(Registry $doctrine, FormFactory $formFactory, UploaderHelper $uploaderHelper)
     {
         $this->doctrine = $doctrine;
         $this->formFactory = $formFactory;
         $this->uploaderHelper = $uploaderHelper;
-        $this->cacheManager = $cacheManager;
     }
 
     /**
      * @param Request $request
      * @return JsonResponse
      */
-    public function postImage(Request $request): JsonResponse
+    public function postDocument(Request $request): JsonResponse
     {
         $this->check($request);
         $requestData = array_merge(
             $request->request->all(),
             $request->files->all()
         );
-        if(!isset($requestData['imageFile'])) {
-            throw new InvalidArgumentException('Field imageFile is empty', 500);
+        if(!isset($requestData['documentFile'])) {
+            throw new InvalidArgumentException('Field documentFile is empty', 500);
         }
         $form = $this->getSubmittedForm($requestData);
-        $previews = $request->get('previews', []);
-        if (!is_array($previews)) {
-            $previews = json_decode($previews, true);
-        }
+
         $response = [];
         $status = 200;
         if ($form->isSubmitted() && $form->isValid()) {
-            $image = $form->getData();
-            $this->saveAndRefreshImage($image);
-            $response = $this->getImageResponseData($image, $previews, true);
+            $document = $form->getData();
+            $this->saveAndRefreshDocument($document);
+            $response = $this->getDocumentResponseData($document);
         } else {
             $response['error'] = $form->getErrors() ?? 'Form is empty or invalid';
             $status = 500;
@@ -95,28 +84,29 @@ class ImageHandler
     {
         $this->check($request);
         $id = $request->get('id', []);
-        $images = $this->getImagesById($id);
+        $documents = $this->getDocumentsById($id);
 
         $response = [];
         $status = 200;
 
-        foreach ($images as $image) {
-            $response[] = $this->getImageResponseData($image);
+        foreach ($documents as $document) {
+            $response[] = $this->getDocumentResponseData($document);
         }
 
         return new JsonResponse($response, $status);
     }
 
     /**
+     * @param Document $document
      * @return JsonResponse
      */
-    public function get(Image $image): JsonResponse
+    public function get(Document $document): JsonResponse
     {
         $response = [];
         $status = 404;
 
-        if ($image && $image->getImageName()) {
-            $response = $this->getImageResponseData($image);
+        if ($document && $document->getDocumentName()) {
+            $response = $this->getDocumentResponseData($document);
             $status = 200;
         }
 
@@ -125,16 +115,17 @@ class ImageHandler
 
 
     /**
+     * @param Document $document
      * @return JsonResponse
      */
-    public function delete(Image $image): JsonResponse
+    public function delete(Document $document): JsonResponse
     {
         $response = [];
         $status = 400;
 
-        if ($image && $image->getImageName()) {
+        if ($document && $document->getDocumentName()) {
             $em = $this->doctrine->getManager();
-            $em->remove($image);
+            $em->remove($document);
             $em->flush();
             $response = null;
             $status = 204;
@@ -165,99 +156,68 @@ class ImageHandler
      */
     private function getSubmittedForm(array $requestData = []): FormInterface
     {
-        $image = new Image();
-        $form = $this->createForm('App\Form\Type\ImageType', $image);
+        $document = new Document();
+        $form = $this->createForm('App\Form\Type\DocumentType', $document);
         $form->submit($requestData);
 
         return $form;
     }
 
     /**
-     * @param Image $image
+     * @param Document $document
      */
-    private function saveAndRefreshImage(Image $image): void
+    private function saveAndRefreshDocument(Document $document): void
     {
         $em = $this->doctrine->getManager();
-        $em->persist($image);
+        $em->persist($document);
         $em->flush();
-        $em->refresh($image);
+        $em->refresh($document);
     }
 
     /**
-     * @param Image $image
+     * @param Document $document
      * @return string
      */
-    private function getOriginalPath(Image $image): string
+    private function getOriginalPath(Document $document): string
     {
-        return $this->uploaderHelper->asset($image, 'imageFile');
-    }
-
-    /**
-     * @param Image $image
-     * @param array $previews
-     * @param bool $resolve
-     * @return array
-     */
-    private function getImagePreviews(Image $image, array $previews = [], bool $resolve = false): array
-    {
-        $index = 1;
-        $client = new \GuzzleHttp\Client();
-        foreach ($previews as $key => $preview) {
-            $path = $this->cacheManager->getBrowserPath($this->getOriginalPath($image), 'view' . $index, $preview);
-            if ($resolve) {
-                $client->request('GET', $path);
-                $previews[$key] = preg_replace('/\?.*/', '', str_replace('/resolve', '', $path));
-            } else {
-                $previews[$key] = $path;
-            }
-
-            $index++;
-        }
-
-        return $previews;
+        return $this->uploaderHelper->asset($document, 'documentFile');
     }
 
     /**
      * @param array $id
      * @return array
      */
-    private function getImagesById(array $id = []): array
+    private function getDocumentsById(array $id = []): array
     {
         if (empty($id)) {
             return [];
         }
 
         $em = $this->doctrine->getManager();
-        $rep = $em->getRepository('App:Image');
-        $images = $rep->findBy([
+        $repository = $em->getRepository('App:Document');
+        $documents = $repository->findBy([
             'id' => $id
         ]);
 
-        return $images;
+        return $documents;
     }
 
     /**
-     * @param Image $image
-     * @param array $previews
-     * @param bool $resolve
+     * @param Document $document
      * @return array
      */
-    private function getImageResponseData(Image $image, array $previews = [], bool $resolve = false): array
+    private function getDocumentResponseData(Document $document): array
     {
         $data = [
-            'id' => $image->getId(),
-            'createdAt' => $image->getCreatedAt()->format(\DateTime::ATOM),
-            'updatedAt' => $image->getUpdatedAt()->format(\DateTime::ATOM),
-            'name' => $image->getImageName(),
-            'size' => $image->getImageSize(),
+            'id' => $document->getId(),
+            'createdAt' => $document->getCreatedAt()->format(\DateTime::ATOM),
+            'updatedAt' => $document->getUpdatedAt()->format(\DateTime::ATOM),
+            'name' => $document->getDocumentName(),
+            'size' => $document->getDocumentSize(),
         ];
-        $path = $this->getOriginalPath($image);
+        $path = $this->getOriginalPath($document);
         if (!empty($path)) {
-            $data['origin'] = getenv('APP_HOST') . $path;
-        }
-        $previews = $this->getImagePreviews($image, $previews, $resolve);
-        if (!empty($previews)) {
-            $data['previews'] = $previews;
+            $data['path'] = getenv('APP_HOST') . $path;
         }
 
         return $data;
