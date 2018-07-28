@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Handler\UserHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends Controller
 {
     /**
-     * @Route("/api/token/get", methods={"POST"})
+     * @Route("/api/token", methods={"POST"})
      */
     public function getTokenAction()
     {
@@ -31,8 +32,7 @@ class UserController extends Controller
     public function confirmationTokenAction(Request $request)
     {
         $token = $request->get('token', null);
-        $handler = $this->get('App\Handler\UserHandler');
-        $response = $handler->confirmationEmail($token);
+        $response = $this->getHandler()->confirmationEmail($token);
 
         return new JsonResponse($response, 200);
     }
@@ -47,9 +47,12 @@ class UserController extends Controller
         if ($request->getContentType() === 'json') {
             $request->request->replace(json_decode($request->getContent(), true));
         }
-        $handler = $this->get('App\Handler\UserHandler');
-        $response = $handler->register($request->request->all());
+        $response = $this->getHandler()->register($request->request->all());
 
         return new JsonResponse(['message'=> $response['message']], $response['code']);
+    }
+
+    private function getHandler(): UserHandler {
+        return $this->get('App\Handler\UserHandler');
     }
 }

@@ -16,3 +16,14 @@ vich_uploader:
             directory_namer:
                 service: vich_uploader.directory_namer_subdir
                 options: {chars_per_dir: 3, dirs: 3}
+
+        document:
+            uri_prefix:         /uploads/documents
+            upload_destination: '%kernel.project_dir%/public/uploads/documents'
+            namer:              vich_uploader.namer_uniqid
+            inject_on_load:     false
+            delete_on_update:   true
+            delete_on_remove:   true
+            directory_namer:
+                service: vich_uploader.directory_namer_subdir
+                options: {chars_per_dir: 3, dirs: 3}

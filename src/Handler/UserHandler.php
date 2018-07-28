@@ -41,6 +41,7 @@ class UserHandler
 
     /**
      * @param User $user
+     * @throws \Exception
      */
     public function hashPassword(User $user)
     {
@@ -93,8 +94,10 @@ class UserHandler
             'code' => $code
         ];
     }
+
     /**
      * @param User $user
+     * @throws \Exception
      */
     public function sendActivateMessage(User $user) {
         $token = $this->generateToken();
@@ -130,6 +133,7 @@ class UserHandler
 
     /**
      * @return string
+     * @throws \Exception
      */
     private function generateToken() {
         return rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
@@ -137,6 +141,7 @@ class UserHandler
 
     /**
      * @return string
+     * @throws \Exception
      */
     private function generateSalt() {
         return rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=');
