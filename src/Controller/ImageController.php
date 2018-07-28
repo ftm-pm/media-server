@@ -19,6 +19,7 @@ class ImageController extends Controller
      * @Route("api/images", name="api_image_post", methods={"POST"})
      * @param Request $request
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function postAction(Request $request): JsonResponse
     {
@@ -29,6 +30,7 @@ class ImageController extends Controller
      * @Route("api/images", name="api_image_get_list", methods={"GET"})
      * @param Request $request
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getListAction(Request $request): JsonResponse
     {
@@ -40,6 +42,7 @@ class ImageController extends Controller
      * @Route("api/images/{image}", name="api_image_get", methods={"GET"})
      * @param Image $image
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getAction(Image $image): JsonResponse
     {

@@ -52,6 +52,21 @@ class Document
      */
     private $documentSize;
 
+    /**
+     * @var string|null $project
+     *
+     * @ORM\Column(name="project", type="string", nullable=true, options={"comment": "Project"})
+     */
+    private $project;
+
+    /**
+     * @var User|null The user
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="documents")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
+     */
+    private $user;
+
     /////////////////////////////////
 
     /**
@@ -129,5 +144,37 @@ class Document
     public function getDocumentSize(): ?int
     {
         return $this->documentSize;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getProject(): ?string
+    {
+        return $this->project;
+    }
+
+    /**
+     * @param null|string $project
+     */
+    public function setProject(?string $project): void
+    {
+        $this->project = $project;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     */
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
     }
 }

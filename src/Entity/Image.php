@@ -32,25 +32,41 @@ class Image
 
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     * @var File $imageFile
      *
      * @Vich\UploadableField(mapping="image", fileNameProperty="imageName", size="imageSize")
      * @Assert\NotNull(message="This value should not be blank")
-     * @var File $imageFile
      */
     private $imageFile;
 
     /**
-     * @ORM\Column(type="string", length=255)
      * @var string $imageName
+     *
+     * @ORM\Column(type="string", length=255)
      */
     private $imageName;
 
     /**
-     * @ORM\Column(type="integer")
-     *
      * @var integer $imageSize
+     *
+     * @ORM\Column(type="integer")
      */
     private $imageSize;
+
+    /**
+     * @var string|null $project
+     *
+     * @ORM\Column(name="project", type="string", nullable=true, options={"comment": "Project"})
+     */
+    private $project;
+
+    /**
+     * @var User|null The user
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="images")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
+     */
+    private $user;
 
     /////////////////////////////////
 
@@ -129,5 +145,37 @@ class Image
     public function getImageSize(): ?int
     {
         return $this->imageSize;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getProject(): ?string
+    {
+        return $this->project;
+    }
+
+    /**
+     * @param null|string $project
+     */
+    public function setProject(?string $project): void
+    {
+        $this->project = $project;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     */
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
     }
 }
