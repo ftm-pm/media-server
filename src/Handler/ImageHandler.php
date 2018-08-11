@@ -3,6 +3,7 @@
 namespace App\Handler;
 
 use App\Entity\Image;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\Form\FormFactory;
@@ -10,6 +11,8 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
@@ -40,23 +43,35 @@ class ImageHandler
     private $cacheManager;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
      * ImageHandler constructor.
      * @param Registry $doctrine
      * @param FormFactory $formFactory
      * @param UploaderHelper $uploaderHelper
      * @param CacheManager $cacheManager
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(Registry $doctrine, FormFactory $formFactory, UploaderHelper $uploaderHelper, CacheManager $cacheManager)
+    public function __construct(Registry $doctrine,
+                                FormFactory $formFactory,
+                                UploaderHelper $uploaderHelper,
+                                CacheManager $cacheManager,
+                                TokenStorageInterface $tokenStorage)
     {
         $this->doctrine = $doctrine;
         $this->formFactory = $formFactory;
         $this->uploaderHelper = $uploaderHelper;
         $this->cacheManager = $cacheManager;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function postImage(Request $request): JsonResponse
     {
@@ -65,7 +80,7 @@ class ImageHandler
             $request->request->all(),
             $request->files->all()
         );
-        if(!isset($requestData['imageFile'])) {
+        if (!isset($requestData['imageFile'])) {
             throw new InvalidArgumentException('Field imageFile is empty', 500);
         }
         $form = $this->getSubmittedForm($requestData);
@@ -90,6 +105,7 @@ class ImageHandler
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function getList(Request $request): JsonResponse
     {
@@ -108,7 +124,9 @@ class ImageHandler
     }
 
     /**
+     * @param Image $image
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function get(Image $image): JsonResponse
     {
@@ -141,6 +159,15 @@ class ImageHandler
         }
 
         return new JsonResponse($response, $status);
+    }
+
+    /**
+     * @param Image $image
+     */
+    public function setOwner(Image $image): void
+    {
+        $user = $this->getUser();
+        $image->setUser($user);
     }
 
     //////////////////////////////////////
@@ -197,6 +224,7 @@ class ImageHandler
      * @param array $previews
      * @param bool $resolve
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function getImagePreviews(Image $image, array $previews = [], bool $resolve = false): array
     {
@@ -241,6 +269,7 @@ class ImageHandler
      * @param array $previews
      * @param bool $resolve
      * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function getImageResponseData(Image $image, array $previews = [], bool $resolve = false): array
     {
@@ -271,5 +300,18 @@ class ImageHandler
         if ($request->getContentType() === 'json') {
             $request->request->replace(json_decode($request->getContent(), true));
         }
+    }
+
+    /**
+     * @return null|User
+     */
+    private function getUser(): ?User
+    {
+        if (!$token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        $user = $token->getUser();
+        return $user instanceof UserInterface ? $user : null;
     }
 }

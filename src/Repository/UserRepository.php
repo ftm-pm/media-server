@@ -15,9 +15,10 @@ class UserRepository extends EntityRepository implements UserLoaderInterface
     /**
      * @param string $email
      * @param null $username
-     * @return mixed|null|\Symfony\Component\Security\Core\User\UserInterface
+     * @return User|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function loadUserByUsername($email, $username = null)
+    public function loadUserByUsername($email, $username = null): ?User
     {
         if(!$username) {
             $username = $email;

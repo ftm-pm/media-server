@@ -3,12 +3,15 @@
 namespace App\Handler;
 
 use App\Entity\Document;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
@@ -34,16 +37,26 @@ class DocumentHandler
     private $uploaderHelper;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
      * DocumentHandler constructor.
      * @param Registry $doctrine
      * @param FormFactory $formFactory
      * @param UploaderHelper $uploaderHelper
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(Registry $doctrine, FormFactory $formFactory, UploaderHelper $uploaderHelper)
+    public function __construct(Registry $doctrine,
+                                FormFactory $formFactory,
+                                UploaderHelper $uploaderHelper,
+                                TokenStorageInterface $tokenStorage)
     {
         $this->doctrine = $doctrine;
         $this->formFactory = $formFactory;
         $this->uploaderHelper = $uploaderHelper;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -151,6 +164,15 @@ class DocumentHandler
     }
 
     /**
+     * @param Document $document
+     */
+    public function setOwner(Document $document): void
+    {
+        $user = $this->getUser();
+        $document->setUser($user);
+    }
+
+    /**
      * @param array $requestData
      * @return FormInterface
      */
@@ -231,5 +253,18 @@ class DocumentHandler
         if ($request->getContentType() === 'json') {
             $request->request->replace(json_decode($request->getContent(), true));
         }
+    }
+
+    /**
+     * @return null|User
+     */
+    private function getUser(): ?User
+    {
+        if (!$token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        $user = $token->getUser();
+        return $user instanceof UserInterface ? $user : null;
     }
 }

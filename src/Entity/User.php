@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
@@ -107,12 +109,28 @@ class User implements AdvancedUserInterface, EquatableInterface, \Serializable
     private $roles;
 
     /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Image", mappedBy="user")
+     */
+    private $images;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="App\Entity\Document", mappedBy="user")
+     */
+    private $documents;
+
+    /**
      * User constructor.
      */
     public function __construct()
     {
         $this->enabled = false;
         $this->roles = [];
+        $this->images = new ArrayCollection();
+        $this->documents = new ArrayCollection();
     }
 
     /**
@@ -467,5 +485,37 @@ class User implements AdvancedUserInterface, EquatableInterface, \Serializable
             $this->addRole($role);
         }
         return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    /**
+     * @param Collection $images
+     */
+    public function setImages(Collection $images): void
+    {
+        $this->images = $images;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getDocuments(): Collection
+    {
+        return $this->documents;
+    }
+
+    /**
+     * @param Collection $documents
+     */
+    public function setDocuments(Collection $documents): void
+    {
+        $this->documents = $documents;
     }
 }

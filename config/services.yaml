@@ -38,6 +38,7 @@ services:
             - "@form.factory"
             - "@vich_uploader.templating.helper.uploader_helper"
             - "@liip_imagine.cache.manager"
+            - "@security.token_storage"
 
     App\Handler\DocumentHandler:
         public: true
@@ -45,16 +46,32 @@ services:
             - "@doctrine"
             - "@form.factory"
             - "@vich_uploader.templating.helper.uploader_helper"
+            - "@security.token_storage"
 
     App\Handler\UserHandler:
         public: true
+
+    App\EntityListener\ImageListener:
+        tags:
+        - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: prePersist, lazy: true  }
+        - { name: doctrine.orm.entity_listener, entity: App\Entity\Image, event: preUpdate, lazy: true  }
+
+    App\EntityListener\DocumentListener:
+        tags:
+        - { name: doctrine.orm.entity_listener, entity: App\Entity\Document, event: prePersist, lazy: true  }
+        - { name: doctrine.orm.entity_listener, entity: App\Entity\Document, event: preUpdate, lazy: true  }
+
+    App\EntityListener\UserListener:
+        tags:
+        - { name: doctrine.orm.entity_listener, entity: App\Entity\User, event: prePersist, lazy: true  }
+        - { name: doctrine.orm.entity_listener, entity: App\Entity\User, event: preUpdate, lazy: true  }
 
     # EventSubscriber
     App\EventSubscriber\DoctrineEventSubscriber:
         tags:
             - { name: doctrine.event_listener, event: prePersist, lazy: true }
             - { name: doctrine.event_listener, event: preUpdate, lazy: true }
-#
-#    App\EventSubscriber\ApiExceptionSubscriber:
-#        tags:
-#        - { name: kernel.event_subscriber }
+
+    App\EventSubscriber\ApiExceptionSubscriber:
+        tags:
+        - { name: kernel.event_subscriber }
